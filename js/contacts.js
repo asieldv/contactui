@@ -23,6 +23,10 @@
                 this.addEvent("add-contact", "click", function () {
                     UI.addContact();
                 });
+                this.addEvent("search", "keyup", function(evt){
+                    if(evt.key === 'Enter')
+                        UI.search(UI.getById("search").value);
+                });
                 this.loadData();
             },
             getById: function(id) {
@@ -109,7 +113,6 @@
                         console.log(error)
                     else 
                         response.forEach(e => UI.addDataLine(e));
-                    console.log(response);
                     UI.hideLoading();
                     
                 });
@@ -117,26 +120,57 @@
             addContact: function (response, error) {
                 this.hide("register-form");
                 this.show("inserting");
-                this.ajax.post((response, error) =>{
+                this.ajax.add((response, error) =>{
                     if(error)
                         console.log(error)
                     UI.hide("inserting");
                     UI.show("register-form");
                 });
             },
+            search: function(searchString) {
+                var names = [];
+                var phones = [];
+                var dates = [];
+                var address = UI.validators.extractAddress(searchString);
+                if(address != null) {
+                    searchString = searchString.replace('\"' + address + '\"',"");
+                }
+                searchString.split(" ").forEach(param => {
+                    if(UI.validators.isDate(param) && params != "")
+                        dates.push(param)
+                    else if(UI.validators.isPhoneNumber(param) && param != "")
+                        phones.push(param)
+                    else if(param != '')
+                        names.push(param);
+                });
+                console.log("names ", names);
+                console.log("phones ", phones);
+                console.log("dates ", dates);
+                console.log("address ", address);
+                this.ajax.search(names[0], address, (res, err) => {
+                    if(error) 
+                        console.error(error)
+                    else
+                        res.forEach(e => UI.addDataLine(e));
+                });
+            },
             ajax: {
                 get: async function (cb) {
                     const url = "http://localhost:8080/contact/findall";
                     fetch(url)
-                        .then(res => {
-                            console.log(res);
-                            var data = res.json();
-                            return data;
-                        })
+                        .then(res => res.json())
                         .then(json => cb(json, null))
                         .catch(error => cb(null, error));
                 },
-                post: async function (cb) {
+                search: function(firstName, address, cb) {
+                    const url = "http://localhost:8080/contact/findbynameandaddress?firstName=" + firstName + "$address=" + address;
+                    fetch(url)
+                        .then(res => res.json())
+                        .then(json => cb(json, null))
+                        .catch(error => cb(null, error));
+                },
+                add: async function (cb) {
+                    const url = "htttp://localhost:8080/contact/addcontact";
                     // Get data from form
 	                const firstName = document.getElementById("firstname").value;
 	                const secondName = document.getElementById("secondname").value;
@@ -148,24 +182,50 @@
                     {
                         cb(null, new Error("Error validating data"));
                     }
-                    UI.data.push({
-                        photo: personalPhoto,
+                    var data = {
                         firstName: firstName,
                         secondName: secondName,
+                        address: address,
                         dateOfBirth: dateOfBirth,
                         phoneNumber: phoneNumber,
-                        address: address
-                    });
-                    UI.cleanForm();
-                    setTimeout(() => {
-                         cb();
-                    }, 2000);
-                }
+                        photo: photo
+                    }
+                    // Default options are marked with *
+                    fetch(url, {
+                        method: "POST", // *GET, POST, PUT, DELETE, etc.
+                        mode: "cors", // no-cors, *cors, same-origin
+                        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: "same-origin", // include, *same-origin, omit
+                        headers: {
+                            "Content-Type": "application/json",
+                            // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: "follow", // manual, *follow, error
+                        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify(data), // body data type must match "Content-Type" header
+                    })
+                        .then(response => response.json())
+                        .then(json => {
+                            UI.cleanForm();
+                            cb(json, null)
+                        })
+                        .catch(error => cb(null, error));
+                },
             },
-            data: [
-                { photo: 'images/avatar.png', firstName: 'Cuco', secondName: 'Pablo', dateOfBirth: '2000/00/01', phoneNumber: '(00)123456', address: 'homeless'},
-                { photo: 'images/avatar.png', firstName: 'Jose', secondName: 'antonio', dateOfBirth: '0000/123/23', phoneNumber: '(88)123456', address: 'Somewhere'},
-            ]
+            validators: {
+                isDate: function(dt) {
+                    var isGoodDate = new RegExp("^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$");
+                    return isGoodDate.test(dt);
+                },
+                isPhoneNumber(nmbr) {
+                    var isGooPhoneNumber = new RegExp("^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$");
+                    return isGooPhoneNumber.test(nmbr);
+                },
+                extractAddress(str){
+                    const matches = str.match(/"(.*?)"/);
+                    return matches ? matches[1] : null;
+                }
+            }
         });
     }
 
