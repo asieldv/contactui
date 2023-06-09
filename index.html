@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Lista de contactos</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="top-bar">
+            <div class="container">
+                <div class="row">
+                    <div class="brand-title">ABC Bank - Contacts</div> 
+                </div>
+                <div class="row">
+                    <div class="col c4">
+                        <a class="btn" href="#" id="add-btn">add</a>
+                        <a class="btn" href="#" id="list-btn">list</a>
+                    </div>
+                    <div class="col c8">
+                        <input type="text" id="search" placeholder="Search ..." oninput="searchContact()"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="add-section" class="container section" style="display:none;">
+            <div class="row section-title">
+                Add new contact information
+            </div>
+            <div class="row">
+                <div class="col c6">
+                    <img src="images/add-contact.png" alt="">
+                </div>
+                <div class="col c6">
+                    <div id="inserting" class="loading" style="display:none;">
+                        <div class="row">
+                            <div class="col c5"></div>
+                            <div class="col c2">
+                                <div class="dots-bars-2"></div>
+                            </div>
+                            <div class="col c5"></div>
+                        </div>
+                        <div class="row">
+                            <h4>registering contact please wait, please wait ...</h4>
+                        </div>
+                    </div>
+
+                    <form id="register-form">
+                        <div class="row">
+                            <input type="text" id="firstname" placeholder="First name" />
+                        </div>
+                        <div class="row">
+                            <input type="text" id="secondname" placeholder="Second name"/>
+                        </div>
+                        <div class="row">
+                            <input type="text" id="address" placeholder="Address" />
+                        </div>
+                        <div class="row">
+                            <input type="date" id="dateofbirth" placeholder="Date of birth"/>
+                        </div>
+                        <div class="row">
+                            <input type="text" id="phonenumber" placeholder="Phone number" />
+                        </div>
+                        <div class="row">
+                            <input type="file" id="photo" name="archivo" placeholder="Photo" accept="image/*" />
+                        </div>
+                        <div class="row">
+                            <div class="col c8"></div>
+                            <div class="col c4">
+                                <a class="btn" href="#" id="add-contact">Add contact</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="list-section" class="container section">
+            <div class="row section-title">
+                Contacts list
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="row">
+                    <div class="col c5"></div>
+                    <div class="col c2">
+                        <div class="dots-bars-2"></div>
+                    </div>
+                    <div class="col c5"></div>
+                </div>
+                <div class="row">
+                    <h4>loading, please wait ...</h4>
+                </div>
+            </div>
+
+            <div row="row">
+                <div id="data-panel" class="card-panel">
+                    <div class="card">
+                        <div class="row">
+                            <div class="col c8">
+                                <img src="images/avatar.png" />
+                            </div>
+                            <div class="col c4">
+                                <div class="row row-data text-small">First name</div>
+                                <div class="row row-data text-small">Second name</div>
+                                <div class="row row-data text-small">Address is where user lives</div>
+                                <div class="row row-data text-small">13/3/2016</div>
+                                <div class="row row-data text-small">(+53) 123 456</div>
+                            </div>
+                        </div>
+                    </div>
+                <div>
+            </div>
+        </div>
+        <script src="js/contacts.js">
+        </script>
+    </body>
+</html>
